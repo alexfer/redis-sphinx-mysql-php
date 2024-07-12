@@ -1,6 +1,6 @@
 ## Docker Environment
 
-Helps to build Mysql8, PHP7.4, Redis Server & Sphinx search
+Helps to build Mysql8, PHP7.4, Redis Server & Sphinx search 2.
 
 #### Before start
 ````
@@ -22,5 +22,5 @@ docker-compose exec sphinx indexer --all --rotate
 ````
 Open file `hosts` & add new line
 ````
-127.0.0.1   exanple.local www.example.local
+127.0.0.1   example.local www.example.local
 ````
