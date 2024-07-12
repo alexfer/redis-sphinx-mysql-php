@@ -1,0 +1,97 @@
+version: '3'
+networks:
+    internal:
+
+services:
+    tmp:
+      image: busybox
+      command: chmod -R 777 /tmp/docker
+      container_name: dev_tmp
+      volumes:
+        - /tmp/docker/
+    sphinx:
+      container_name: sphinx
+      image: jc21/sphinxsearch:latest
+      restart: unless-stopped
+      ports:
+          - "9306:9306"
+          - "9312:9312"
+      volumes:
+          - ./config/sphinx/sphinx.conf:/etc/sphinx/sphinx.conf
+          - ./data/logs/sphinx:/var/log/sphinx
+          - ./database/sphinx:/var/lib/sphinx
+      depends_on:
+          - mysql
+          - php
+      networks:
+          - internal
+    nginx:
+        image: nginx:stable-alpine
+        container_name: nginx
+        restart: always
+        ports:
+            - "80:80"
+        volumes:
+            - ./dev:/var/www
+            - ./config/nginx:/etc/nginx/conf.d
+            - ./data/logs:/var/log/nginx/
+        depends_on:
+            - php
+        networks:
+            - internal
+    redis:
+      image: redis
+      command: redis-server /etc/redis.conf
+      container_name: redis
+      restart: unless-stopped
+      volumes:
+        - ./config/redis/redis.conf:/etc/redis.conf
+        - ./database/redis:/data
+      volumes_from:
+        - tmp
+    php:
+      build:
+        context: ./config/php
+        dockerfile: Dockerfile
+      container_name: php
+      restart: always
+      volumes:
+          - ./dev:/var/www
+          - ./config/php/php.ini:/usr/local/etc/php/php.ini
+      ports:
+          - "9000:9000"
+      networks:
+          - internal
+      volumes_from:
+        - tmp
+    mysql:
+       image: mysql:8.0.1
+       container_name: mysql
+       restart: unless-stopped
+       #command: ["mysqld", "--mysql-native-password=ON"]
+       ports:
+           - "3306:3306"
+       networks:
+         - internal
+       depends_on:
+         - php
+       volumes:
+         - ./config/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+         - ./database/mysql:/var/lib/mysql
+       environment:
+           MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+       volumes_from:
+         - tmp
+    phpmyadmin:
+       container_name: phpmyadmin
+       image: phpmyadmin
+       restart: always
+       links:
+           - mysql
+       ports:
+           - "8082:80"
+       environment:
+           - PMA_ARBITRARY=1
+       networks:
+           - internal
+
