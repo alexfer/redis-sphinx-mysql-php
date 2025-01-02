@@ -19,7 +19,7 @@ services:
           - "9312:9312"
       volumes:
           - ./config/sphinx/sphinx.conf:/etc/sphinx/sphinx.conf
-          - ./data/logs/sphinx:/var/log/sphinx
+          - ./logs/sphinx:/var/log/sphinx
           - ./database/sphinx:/var/lib/sphinx
       depends_on:
           - mysql
@@ -35,7 +35,7 @@ services:
         volumes:
             - ./dev:/var/www
             - ./config/nginx:/etc/nginx/conf.d
-            - ./data/logs:/var/log/nginx/
+            - ./logs:/var/log/nginx/
         depends_on:
             - php
         networks:
