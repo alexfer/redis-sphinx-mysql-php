@@ -72,6 +72,7 @@ services:
        #command: ["mysqld", "--mysql-native-password=ON"]
        ports:
            - "3306:3306"
+           - "3307:3306" 
        networks:
          - internal
        depends_on:
@@ -89,6 +90,8 @@ services:
        restart: always
        links:
            - mysql
+       volumes:
+         - ./config/pma/config.inc.php:/var/www/html/config.inc.php
        ports:
            - "8082:80"
        environment:
