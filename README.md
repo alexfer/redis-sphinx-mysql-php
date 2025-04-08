@@ -10,6 +10,7 @@ and change your configuration
 
 #### To run & build execute following command:
 ````
+docker-compose run --rm sphinx indexer --all
 docker-compose up -d --bild 
 ````
 #### After that check the containers are working
